@@ -52,14 +52,6 @@ end
     Basic GET and POST requests
 ]]
 
-local function toFormBody(data)
-    local body = ""
-    for k,v in pairs(data) do
-        body = body .. textutils.urlEncode(k) .. "=" .. textutils.urlEncode(v) .. "&"
-    end
-    return body
-end
-
 function Krypton:get(endpoint)
     local url = self.node .. endpoint
     local response, err = http.get(url)
@@ -82,7 +74,7 @@ end
 
 function Krypton:post(endpoint, data)
     local url = self.node .. endpoint
-    local response, err = http.post(url, toFormBody(data))
+    local response, err = http.post(url, textutils.serializeJSON(data))
     if not response then
         error(err, 3)
     end
