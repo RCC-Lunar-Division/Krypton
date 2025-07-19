@@ -64,35 +64,39 @@ function Krypton:get(endpoint)
 	local body = response.readAll()
 	response.close()
 
-	local data = textutils.unserializeJSON(body)
-	if not data.ok then
-		if data.error ~= "invalid_parameter" then
-			error(data.error, 3)
+	local response = textutils.unserializeJSON(body)
+	if not response.ok then
+		if response.error ~= "invalid_parameter" then
+			error(response.error, 3)
 		else
-			error({ data.error, data.parameter }, 3)
+			error({ response.error, response.parameter }, 3)
 		end
 	end
-	return data
+	return response
 end
 
 function Krypton:post(endpoint, data)
 	local url = self.node .. endpoint
-	local response, err = http.post(url, textutils.serializeJSON(data))
+	local response, err = http.post(url, textutils.serializeJSON(data), {
+		["Content-Type"] = "application/json",
+	})
+
 	if not response then
 		error(err, 3)
 	end
+
 	local body = response.readAll()
 	response.close()
 
-	local data = textutils.unserializeJSON(body)
-	if not data.ok then
-		if data.error ~= "invalid_parameter" then
-			error(data.error, 3)
+	local deserialized_body = textutils.unserializeJSON(body)
+	if not deserialized_body.ok then
+		if deserialized_body.error ~= "invalid_parameter" then
+			error(deserialized_body.error, 3)
 		else
-			error({ data.error, data.parameter }, 3)
+			error({ deserialized_body.error, deserialized_body.parameter }, 3)
 		end
 	end
-	return data
+	return deserialized_body
 end
 
 --[[
